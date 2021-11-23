@@ -1,9 +1,9 @@
 # sendsafely-upload-tool
 
-Instructions:
+### How to run:
+---
+Build the jar with dependencies using maven:\
+`mvn clean compile assembly:single`
 
-Build the jar with dependencies using maven:
-<mvn clean compile assembly:single>
-
-Run the jar:
-<java -jar target/upload-cli-1.0-SNAPSHOT-jar-with-dependencies.jar SendSafelyHost UserApiKey UserApiSecret -d:--debug>
+Run the jar:\
+`java -jar target/upload-cli-1.0-SNAPSHOT-jar-with-dependencies.jar SendSafelyHost UserApiKey UserApiSecret -d:--debug`
