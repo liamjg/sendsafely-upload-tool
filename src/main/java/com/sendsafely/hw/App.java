@@ -21,6 +21,7 @@ public class App {
 		String secret = args[2];
 		boolean debug = args.length == 4 && Arrays.asList(DEBUG_FLAGS).contains(args[3]);
 
+		// instantiate and run the upload tool with parsed args
 		try {
 			new SendSafelyUploadTool(host, key, secret, debug).runTool();
 		} catch (InvalidCredentialsException e) {

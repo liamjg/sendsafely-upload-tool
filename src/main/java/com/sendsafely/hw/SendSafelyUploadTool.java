@@ -2,11 +2,11 @@ package com.sendsafely.hw;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.sendsafely.Package;
 import com.sendsafely.Recipient;
@@ -39,6 +39,7 @@ public class SendSafelyUploadTool {
 		this.debug = debug;
 	}
 
+	// main loop
 	public void runTool() {
 		this.in = new Scanner(System.in);
 
@@ -68,6 +69,7 @@ public class SendSafelyUploadTool {
 		System.out.println("\nDone.");
 	}
 
+	// create a package loop
 	private void runCreateAPackage() {
 		Package pkg = createPackage();
 
@@ -80,12 +82,18 @@ public class SendSafelyUploadTool {
 		boolean run = true;
 
 		do {
-			List<String> recipients = operations.stream()
-					.filter(operation -> operation.getOperation() == Operation.ADD_RECIPIENT)
-					.map(operation -> operation.getPayload()).collect(Collectors.toList());
+			// TODO: better way to parse these out?
+			List<String> recipients = new ArrayList<String>();
+			List<String> paths = new ArrayList<String>();
 
-			List<String> paths = operations.stream().filter(operation -> operation.getOperation() == Operation.ADD_FILE)
-					.map(operation -> operation.getPayload()).collect(Collectors.toList());
+			operations.forEach(operation -> {
+				if (operation.getOperation() == Operation.ADD_FILE) {
+					paths.add(operation.getPayload());
+
+				} else if (operation.getOperation() == Operation.ADD_RECIPIENT) {
+					recipients.add(operation.getPayload());
+				}
+			});
 
 			printPackageData(packageId, recipients, paths);
 
@@ -107,8 +115,14 @@ public class SendSafelyUploadTool {
 				addFile();
 				break;
 			case "3":
-				finalizePackage(pkg, recipients, paths);
-				run = false;
+				PackageURL result = finalizePackage(pkg, recipients, paths);
+
+				if (result != null) {
+					System.out.println("\nFinalized Package:");
+					System.out.println(result.getSecureLink());
+					run = false;
+				}
+
 				break;
 			case "u":
 				undoOperation();
@@ -200,10 +214,10 @@ public class SendSafelyUploadTool {
 		}
 	}
 
-	private void finalizePackage(Package pkg, List<String> recipients, List<String> paths) {
+	private PackageURL finalizePackage(Package pkg, List<String> recipients, List<String> paths) {
 		if (recipients.size() == 0 || paths.size() == 0) {
 			System.out.println("\nERROR: Package must have at least 1 file and at least 1 recipient to finalize");
-			return;
+			return null;
 		}
 
 		String packageId = pkg.getPackageId();
@@ -271,8 +285,8 @@ public class SendSafelyUploadTool {
 			if (this.debug)
 				e.printStackTrace();
 		}
-		System.out.println("\nFinalized Package:");
-		System.out.println(packageLink.getSecureLink());
+
+		return packageLink;
 	}
 
 	private void undoOperation() {

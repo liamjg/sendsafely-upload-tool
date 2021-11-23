@@ -1,6 +1,5 @@
 package com.sendsafely.hw;
 
-
 public class PackageOperation {
 
 	private Operation operation;
@@ -9,7 +8,6 @@ public class PackageOperation {
 	public PackageOperation(Operation operation, String payload) {
 		this.operation = operation;
 		this.payload = payload;
-
 	}
 
 	public Operation getOperation() {
